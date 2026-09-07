@@ -35,4 +35,10 @@ Goal: Get a working FastAPI + Postgres skeleton with basic Admin/User model, bef
   - Created `app/core/database.py` with async engine, session factory, and `get_db()` dependency
   - Added `/health/db` endpoint proving a real DB round-trip via `SELECT 1`
 
-- **Step 6 — First DB model + Alembic migrations** ⏳ (next)
+- **Step 6 — First DB model + Alembic migrations** ✅
+  - Added shared `Base` (DeclarativeBase) in `app/core/database.py`
+  - Created `User` model (UUID pk, email, hashed_password, role enum, is_active, created_at)
+  - Initialized Alembic, configured `env.py` for async engine + our models
+  - Generated + applied first migration, verified `users` table in Postgres
+
+- **Step 7 — Password hashing + basic user creation (no auth endpoints yet)** ⏳ (next)

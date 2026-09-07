@@ -78,3 +78,24 @@ Concepts learned during this build — what it is, when to use it, why it matter
 
 **What:** A session setting that stops SQLAlchemy from invalidating (expiring) Python objects after a commit.
 **Why:** By default, after `commit()`, accessing an object's attributes triggers a fresh DB query. In an async context this can cause subtle bugs/extra queries. Disabling it means the object keeps its last-known values in memory after commit — the tradeoff being you must re-fetch manually if you need guaranteed-fresh data.
+
+## Alembic
+
+**What:** SQLAlchemy's official migration tool — tracks schema changes as an ordered sequence of versioned Python scripts.
+**Why:** Letting SQLAlchemy auto-create tables (`Base.metadata.create_all()`) works for toy scripts but gives you no history, no rollback, and no safe way to evolve a schema that already has data in it. Alembic solves all three: every schema change is a reviewable, revertible migration file.
+**When it matters:** Any time a model changes (new column, new table, renamed field) in this project, it goes through `alembic revision --autogenerate` + review + `alembic upgrade head` — never manual `ALTER TABLE` or `create_all()`.
+
+## DeclarativeBase / shared Base class
+
+**What:** The common parent class (`Base`) that all SQLAlchemy ORM models inherit from.
+**Why:** SQLAlchemy uses `Base.metadata` to know about every table that exists. Alembic reads this same metadata to autogenerate migrations by diffing it against the actual DB schema. One shared `Base` = one source of truth for "what tables should exist."
+
+## UUID primary keys vs auto-increment integers
+
+**What:** Using a randomly generated UUID as a row's primary key instead of a sequential integer.
+**Why:** Sequential IDs leak information (row counts, creation order) and can collide if you ever merge data from multiple databases (e.g. multi-tenant, migrations, sharding). UUIDs avoid both problems at the cost of slightly larger index size — a good tradeoff for user-facing entities.
+
+## Enum columns
+
+**What:** A database column constrained to a fixed set of string values (here, `UserRole.ADMIN` / `UserRole.END_USER`), backed by Python's `enum.Enum` and mapped via `sqlalchemy.Enum`.
+**Why:** Enforces valid roles at the database level, not just in application code — a bad value can't sneak into `role` even from raw SQL or a bug elsewhere.

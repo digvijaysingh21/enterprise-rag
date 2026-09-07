@@ -1,4 +1,35 @@
+# from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+
+# from app.core.config import settings
+
+# engine = create_async_engine(settings.DATABASE_URL, echo=settings.DEBUG)
+
+# AsyncSessionLocal = async_sessionmaker(
+#     bind=engine,
+#     class_=AsyncSession,
+#     expire_on_commit=False,
+# )
+
+
+# async def get_db():
+#     """
+#     FastAPI dependency that yields a DB session per request
+#     and guarantees it's closed afterward, even on error.
+#     """
+#     async with AsyncSessionLocal() as session:
+#         yield session
+
+
+
+
+
+
+
+
+
+
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import DeclarativeBase
 
 from app.core.config import settings
 
@@ -9,6 +40,11 @@ AsyncSessionLocal = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
 )
+
+
+class Base(DeclarativeBase):
+    """Shared declarative base — every model inherits from this."""
+    pass
 
 
 async def get_db():
