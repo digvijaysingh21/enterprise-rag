@@ -34,3 +34,9 @@ Concepts learned during this build — what it is, when to use it, why it matter
 
 **What:** Tells git which files/folders to never track (venv, cache files, secrets, compiled files).
 **Why:** Keeps the repo clean and prevents accidentally committing machine-specific or sensitive files.
+
+## Pydantic Settings (BaseSettings)
+
+**What:** A Pydantic subclass that automatically loads and validates config from environment variables / a .env file into typed Python attributes.
+**Why:** Centralizes all config in one typed, validated place instead of scattered `os.environ.get()` calls with no validation. Fails fast at startup if config is wrong, rather than failing mysteriously mid-request.
+**When it matters:** Every setting the app needs — DB URLs, API keys, feature flags — should live in `Settings`, never hardcoded inline.

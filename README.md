@@ -18,4 +18,10 @@ Goal: Get a working FastAPI + Postgres skeleton with basic Admin/User model, bef
   - Added `.gitignore`, `requirements.txt`, `.env.example`
   - First real git commit
 
-- **Step 3 — Config Management** ⏳ (next)
+- **Step 3 — Config Management** ✅
+  - Installed `pydantic-settings`
+  - Created `app/core/config.py` with typed `Settings` class loading from `.env`
+  - Wired `settings` into `main.py`, `/health` now reflects `ENVIRONMENT` from `.env`
+  - Added `.env` (git-ignored) and updated `.env.example`
+
+- **Step 4 — PostgreSQL setup with Docker** ⏳ (next)
