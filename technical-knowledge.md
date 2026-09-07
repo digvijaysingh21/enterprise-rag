@@ -57,3 +57,24 @@ Concepts learned during this build — what it is, when to use it, why it matter
 
 **What:** Postgres username/password/db name are read by the container from environment variables at first startup (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`).
 **Why:** Same reasoning as app config — credentials never get hardcoded into `docker-compose.yml` directly in a real setup; they come from `.env`, which Docker Compose reads automatically if present in the same directory.
+
+## SQLAlchemy Async Engine
+
+**What:** SQLAlchemy 2.x's async API (`create_async_engine`, `AsyncSession`) for running database queries without blocking the event loop.
+**Why:** FastAPI is async-native. If you use SQLAlchemy's classic sync engine inside an `async def` route, that DB call blocks the whole event loop while it waits — killing concurrency. The async engine lets FastAPI handle other requests while waiting on the DB.
+**When it matters:** Every DB-touching route in this project uses `async def` + the async session, never the sync API.
+
+## asyncpg
+
+**What:** A PostgreSQL driver for Python built specifically for async I/O (used internally by SQLAlchemy's async engine via the `postgresql+asyncpg://` URL scheme).
+**Why:** The default `psycopg2` driver most tutorials use is sync-only. `asyncpg` is what actually makes async queries possible.
+
+## FastAPI Dependency Injection (`Depends`)
+
+**What:** FastAPI's mechanism for declaring "this route needs X" and having FastAPI provide it automatically — here, `Depends(get_db)` gives the route a DB session.
+**Why:** Centralizes session creation/cleanup in one place (`get_db`), rather than every route manually opening and closing sessions. It also makes testing easier later — you can swap in a fake DB session for tests without touching route code.
+
+## `expire_on_commit=False`
+
+**What:** A session setting that stops SQLAlchemy from invalidating (expiring) Python objects after a commit.
+**Why:** By default, after `commit()`, accessing an object's attributes triggers a fresh DB query. In an async context this can cause subtle bugs/extra queries. Disabling it means the object keeps its last-known values in memory after commit — the tradeoff being you must re-fetch manually if you need guaranteed-fresh data.

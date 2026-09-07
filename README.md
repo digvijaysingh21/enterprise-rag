@@ -29,4 +29,10 @@ Goal: Get a working FastAPI + Postgres skeleton with basic Admin/User model, bef
   - DB credentials moved into `.env` / `.env.example`
   - Verified connection via `docker exec -it rag_postgres psql -U rag_user -d rag_db`
 
-- **Step 5 — Connect FastAPI to PostgreSQL (SQLAlchemy + async engine)** ⏳ (next)
+- **Step 5 — Connect FastAPI to PostgreSQL (SQLAlchemy + async engine)** ✅
+  - Installed `sqlalchemy[asyncio]` + `asyncpg`
+  - Added `DATABASE_URL` as a computed property in `Settings`
+  - Created `app/core/database.py` with async engine, session factory, and `get_db()` dependency
+  - Added `/health/db` endpoint proving a real DB round-trip via `SELECT 1`
+
+- **Step 6 — First DB model + Alembic migrations** ⏳ (next)
