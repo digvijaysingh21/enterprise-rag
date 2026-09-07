@@ -40,3 +40,20 @@ Concepts learned during this build — what it is, when to use it, why it matter
 **What:** A Pydantic subclass that automatically loads and validates config from environment variables / a .env file into typed Python attributes.
 **Why:** Centralizes all config in one typed, validated place instead of scattered `os.environ.get()` calls with no validation. Fails fast at startup if config is wrong, rather than failing mysteriously mid-request.
 **When it matters:** Every setting the app needs — DB URLs, API keys, feature flags — should live in `Settings`, never hardcoded inline.
+
+## Docker Compose
+
+**What:** A tool for defining and running multi-container Docker setups from a single `docker-compose.yml` file, instead of long `docker run` commands.
+**Why:** As this project grows (Postgres, ChromaDB, workers, etc.), we'll need several containers running together with shared networking. Compose declares the whole stack as one file, version-controlled alongside the code.
+**When it matters:** Any time we add a new piece of infrastructure (vector DB, Redis cache, MinIO), it goes into this same `docker-compose.yml` as a new service.
+
+## Docker Volumes
+
+**What:** Persistent storage that lives outside the container's filesystem (`pgdata` in our compose file).
+**Why:** Containers are ephemeral — if you remove and recreate the Postgres container without a volume, all your data is gone. The volume survives container recreation.
+**When it matters:** Any stateful service (databases, vector stores) needs a volume, or you'll lose data on every `docker compose down`.
+
+## Environment variables for DB credentials
+
+**What:** Postgres username/password/db name are read by the container from environment variables at first startup (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`).
+**Why:** Same reasoning as app config — credentials never get hardcoded into `docker-compose.yml` directly in a real setup; they come from `.env`, which Docker Compose reads automatically if present in the same directory.

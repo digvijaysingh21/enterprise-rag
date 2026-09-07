@@ -24,4 +24,9 @@ Goal: Get a working FastAPI + Postgres skeleton with basic Admin/User model, bef
   - Wired `settings` into `main.py`, `/health` now reflects `ENVIRONMENT` from `.env`
   - Added `.env` (git-ignored) and updated `.env.example`
 
-- **Step 4 — PostgreSQL setup with Docker** ⏳ (next)
+- **Step 4 — PostgreSQL setup with Docker** ✅
+  - Added `docker-compose.yml` with a `postgres:16` service
+  - DB credentials moved into `.env` / `.env.example`
+  - Verified connection via `docker exec -it rag_postgres psql -U rag_user -d rag_db`
+
+- **Step 5 — Connect FastAPI to PostgreSQL (SQLAlchemy + async engine)** ⏳ (next)
