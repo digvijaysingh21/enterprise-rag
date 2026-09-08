@@ -47,4 +47,13 @@ Goal: Get a working FastAPI + Postgres skeleton with basic Admin/User model, bef
   - Created first admin user, verified in Postgres via psql
   - Added first pytest tests (`tests/test_security.py`) for hashing round-trip + rejection of wrong password
 
-- **Step 8 — Auth endpoints (register/login) + JWT issuing** ⏳ (next)
+- **Step 8 — Auth endpoints (register/login) + JWT issuing** ✅
+  - Added JWT creation/decoding to `app/core/security.py` (`python-jose`)
+  - Added `app/api/schemas.py` (register/login/token/user response schemas)
+  - Added `app/api/deps.py` with `get_current_user` and `require_admin` dependencies (RBAC foundation)
+  - Added `app/api/auth.py` router: `POST /auth/register`, `POST /auth/login`, `GET /auth/me`
+  - Verified full flow via `/docs` and PowerShell: register → login → call protected route with token → 401 without token
+
+**Phase 0 status: essentially complete.** One more step to properly close it out (tests + review) before moving to Phase 1.
+
+- **Step 9 — Phase 0 wrap-up: integration tests + review + phase-end push** ⏳ (next)

@@ -120,3 +120,29 @@ Concepts learned during this build — what it is, when to use it, why it matter
 
 **What:** `scripts/create_user.py` creates a user by calling the DB layer directly, bypassing the API entirely.
 **Why:** Useful for seeding/admin tasks and, right now, for proving the model + security layer work before building the API surface on top. Not a substitute for real endpoints — Step 8 builds the actual `/auth/register` and `/auth/login` routes.
+
+## JWT (JSON Web Token)
+
+**What:** A signed, self-contained token encoding claims (here: user id, role, expiry) that the server can verify without a database lookup, just by checking the signature.
+**Why:** Stateless auth — the server doesn't need to store sessions. The token itself proves identity as long as the signature (using `JWT_SECRET_KEY`) checks out and it hasn't expired.
+**Caveat to remember:** Because JWTs are stateless, you can't easily "revoke" one before it expires (no server-side session to delete). For now our 60-minute expiry limits the blast radius; proper revocation (e.g. a blocklist, refresh-token rotation) is a later hardening step, not Phase 0.
+
+## OAuth2PasswordBearer
+
+**What:** FastAPI's built-in helper that reads the `Authorization: Bearer <token>` header from a request and extracts the raw token string.
+**Why:** It's _only_ used here for the token extraction convenience and for `/docs`' "Authorize" button integration — we're not doing full OAuth2, just borrowing this one utility for bearer-token auth.
+
+## FastAPI `APIRouter`
+
+**What:** A way to group related routes (here, all `/auth/*` routes) into their own module, then mount them onto the main `app` via `include_router`.
+**Why:** Keeps `main.py` from becoming a dumping ground for every route in the system. Each domain (auth, documents, chat, etc.) gets its own router file under `app/api/`.
+
+## Dependency-based RBAC (`require_admin`)
+
+**What:** A FastAPI dependency that wraps `get_current_user` and additionally checks the user's role, raising 403 if it doesn't match.
+**Why:** This is the pattern the whole authorization system builds on: any route that needs restricting just adds `Depends(require_admin)` (or a future `require_role(...)` variant) to its signature. Authorization logic lives in one place, not copy-pasted into every route.
+
+## `response_model` in FastAPI
+
+**What:** Declaring `response_model=UserResponse` on a route tells FastAPI to serialize the return value through that Pydantic schema, filtering out any fields not defined on it.
+**Why:** Critically, this is what keeps `hashed_password` out of API responses — even though the route returns a full `User` ORM object, only the fields on `UserResponse` (id, email, role, is_active) ever reach the client.
