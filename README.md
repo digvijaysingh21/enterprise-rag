@@ -56,4 +56,21 @@ Goal: Get a working FastAPI + Postgres skeleton with basic Admin/User model, bef
 
 **Phase 0 status: essentially complete.** One more step to properly close it out (tests + review) before moving to Phase 1.
 
-- **Step 9 — Phase 0 wrap-up: integration tests + review + phase-end push** ⏳ (next)
+- **Step 9 — Phase 0 wrap-up** ✅
+  - Added `pytest.ini` (`asyncio_mode = auto`) and `tests/conftest.py` (in-process async test client)
+  - Added integration tests for the full auth flow: register→login→protected route, wrong password, no token, duplicate email
+  - Full test suite passing (unit + integration)
+  - Froze dependencies to `requirements.txt`
+  - Pushed to GitHub remote
+
+**✅ Phase 0 complete.** Backend skeleton is solid: FastAPI, async Postgres via SQLAlchemy, Alembic migrations, User model with Admin/End User roles, JWT auth with RBAC foundation (`require_admin`), pytest suite (unit + integration), Docker Compose for infra, and full documentation discipline established.
+
+**Known debt (intentionally deferred, not forgotten):**
+
+- Integration tests run against the dev database, not an isolated test DB — needs proper test isolation before the suite grows much further
+- No token revocation/refresh-token flow yet — JWTs simply expire after 60 minutes
+- No rate limiting on `/auth/login` yet (brute-force protection)
+
+---
+
+## Phase 1 — [next phase: Document Management] ⏳

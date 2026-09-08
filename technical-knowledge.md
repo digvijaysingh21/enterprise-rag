@@ -146,3 +146,23 @@ Concepts learned during this build — what it is, when to use it, why it matter
 
 **What:** Declaring `response_model=UserResponse` on a route tells FastAPI to serialize the return value through that Pydantic schema, filtering out any fields not defined on it.
 **Why:** Critically, this is what keeps `hashed_password` out of API responses — even though the route returns a full `User` ORM object, only the fields on `UserResponse` (id, email, role, is_active) ever reach the client.
+
+## In-process ASGI testing (`httpx.ASGITransport`)
+
+**What:** A way to test a FastAPI app by talking to it directly in-process via its ASGI interface, with no real network socket or running `uvicorn` server involved.
+**Why:** Much faster than spinning up a real server for tests, and avoids port-conflict flakiness. This is the standard way to integration-test FastAPI apps.
+
+## Integration tests vs unit tests (in practice now)
+
+**What:** `test_auth.py` tests exercise the real route → real dependency injection → real database, end to end. Contrast with `test_security.py` from Step 7, which tested one function in total isolation.
+**Why:** Unit tests catch logic bugs fast and cheap; integration tests catch wiring bugs (wrong dependency, wrong status code, serialization leaking a field) that unit tests structurally can't see. Both are needed — neither is a substitute for the other.
+
+## Test database isolation (why we're deferring it, not skipping it)
+
+**What:** Right now our integration tests write real rows into the dev Postgres database. Proper practice is either a dedicated test database, or wrapping each test in a transaction that's rolled back afterward so tests never leave residue.
+**Why it's deferred for now:** Solving this properly (test containers, fixtures with rollback) is its own small project. Doing it now would have doubled the size of this step for a Phase-0-skeleton project. Logged explicitly as debt so it doesn't get forgotten — this is a discipline worth practicing: acceptable shortcuts get written down, not silently ignored.
+
+## Why we track "known debt" explicitly in the README
+
+**What:** A dedicated section listing deliberate shortcuts taken and what's missing as a result.
+**Why:** In real engineering, every non-trivial system has known gaps. Writing them down (rather than pretending the phase is "fully done") is what separates an honest, maintainable project from one where problems get discovered the hard way later.
