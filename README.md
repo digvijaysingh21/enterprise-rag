@@ -41,4 +41,10 @@ Goal: Get a working FastAPI + Postgres skeleton with basic Admin/User model, bef
   - Initialized Alembic, configured `env.py` for async engine + our models
   - Generated + applied first migration, verified `users` table in Postgres
 
-- **Step 7 — Password hashing + basic user creation (no auth endpoints yet)** ⏳ (next)
+- **Step 7 — Password hashing + basic user creation** ✅
+  - Added `app/core/security.py` with `hash_password` / `verify_password` using `bcrypt` directly
+  - Added `scripts/create_user.py` to create a user outside the API (proves the model end-to-end)
+  - Created first admin user, verified in Postgres via psql
+  - Added first pytest tests (`tests/test_security.py`) for hashing round-trip + rejection of wrong password
+
+- **Step 8 — Auth endpoints (register/login) + JWT issuing** ⏳ (next)

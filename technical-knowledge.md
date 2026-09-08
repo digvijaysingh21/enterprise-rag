@@ -99,3 +99,24 @@ Concepts learned during this build — what it is, when to use it, why it matter
 
 **What:** A database column constrained to a fixed set of string values (here, `UserRole.ADMIN` / `UserRole.END_USER`), backed by Python's `enum.Enum` and mapped via `sqlalchemy.Enum`.
 **Why:** Enforces valid roles at the database level, not just in application code — a bad value can't sneak into `role` even from raw SQL or a bug elsewhere.
+
+## bcrypt password hashing
+
+**What:** A one-way hashing algorithm purpose-built for passwords, with a deliberately slow, tunable cost factor and a randomly generated salt baked into every hash it produces.
+**Why:** Passwords must never be stored in plaintext or with reversible encryption — if the DB ever leaks, hashed passwords (properly salted) are extremely expensive to crack, whereas plaintext or weakly-hashed (e.g. plain MD5/SHA256) passwords are not. bcrypt's slowness is a _feature_ — it makes brute-forcing infeasible at scale.
+**When it matters:** Every password anywhere in this system — user login, any future service credentials stored in the DB — goes through this, never raw.
+
+## Why passlib was avoided
+
+**What:** `passlib` is a popular older password-hashing wrapper library, but it's effectively unmaintained and has known compatibility breaks with recent `bcrypt` releases.
+**Why:** Calling `bcrypt` directly avoids depending on an unmaintained middle layer for something as security-critical as password hashing.
+
+## Unit tests vs integration tests (first look)
+
+**What:** `test_security.py` is a **unit test** — it tests one function in isolation, with no database, no network, no external state.
+**Why:** Unit tests should be the fastest, most numerous tests in the suite. Later, when we test things like "can a user log in via the API," those become **integration tests** (touching the DB, the HTTP layer) — slower, fewer, but catching different classes of bugs. Keeping this distinction clear now avoids a slow, tangled test suite later.
+
+## One-off scripts vs API endpoints
+
+**What:** `scripts/create_user.py` creates a user by calling the DB layer directly, bypassing the API entirely.
+**Why:** Useful for seeding/admin tasks and, right now, for proving the model + security layer work before building the API surface on top. Not a substitute for real endpoints — Step 8 builds the actual `/auth/register` and `/auth/login` routes.
