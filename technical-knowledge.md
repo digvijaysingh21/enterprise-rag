@@ -166,3 +166,23 @@ Concepts learned during this build — what it is, when to use it, why it matter
 
 **What:** A dedicated section listing deliberate shortcuts taken and what's missing as a result.
 **Why:** In real engineering, every non-trivial system has known gaps. Writing them down (rather than pretending the phase is "fully done") is what separates an honest, maintainable project from one where problems get discovered the hard way later.
+
+## Python's built-in `logging` module vs `print()`
+
+**What:** A structured, leveled (`DEBUG`/`INFO`/`WARNING`/`ERROR`) logging framework built into Python, configured once and used everywhere via `logging.getLogger(__name__)`.
+**Why:** `print()` statements can't be turned off/on by severity, can't be filtered by module, and don't include timestamps or context by default. Real applications configure logging once centrally and never use `print()` for anything except one-off scripts (like our `create_user.py`).
+
+## Request-logging middleware
+
+**What:** FastAPI/Starlette middleware (`@app.middleware("http")`) that wraps every single request, letting us log method/path/status/duration for all traffic in one place.
+**Why:** This is baseline observability — without it, you have no record of what requests hit your API or how long they took. It's also the seed of what becomes proper request tracing/observability in later phases.
+
+## Logging security events without logging secrets
+
+**What:** Our auth logs record _what happened and to whom_ (email, user id, success/failure) but never _sensitive material_ (passwords, password hashes, tokens).
+**Why:** Logs often end up in less-protected places than the primary database (log aggregators, third-party services, disk files with looser access control) — treat anything written to a log as potentially less secure than the DB itself.
+
+## Silencing noisy third-party loggers
+
+**What:** Explicitly setting stricter log levels for libraries like `uvicorn.access` and `sqlalchemy.engine` so they don't drown out your own application's logs.
+**Why:** Default third-party log verbosity is tuned for that library's debugging needs, not yours — left unchecked, useful application logs get lost in noise.

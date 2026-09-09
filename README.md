@@ -63,6 +63,14 @@ Goal: Get a working FastAPI + Postgres skeleton with basic Admin/User model, bef
   - Froze dependencies to `requirements.txt`
   - Pushed to GitHub remote
 
+  - **Step 10 — Structured logging** ✅
+  - Added `app/core/logging_config.py` (console logging, level driven by `DEBUG`, quiets noisy third-party loggers)
+  - Added request-logging middleware (`method path -> status (duration)` for every request)
+  - Turned off raw SQLAlchemy `echo` in favor of proper logging
+  - Added security-relevant log lines to auth flow: registration, login success, login failure, duplicate-email attempts (email only — never passwords/hashes)
+
+**✅ Phase 0 truly complete** — all originally scoped items covered: repo structure, Docker, FastAPI, async architecture, PostgreSQL, SQLAlchemy/Alembic, config/secrets, logging, health checks, pytest, basic Admin/User model.
+
 **✅ Phase 0 complete.** Backend skeleton is solid: FastAPI, async Postgres via SQLAlchemy, Alembic migrations, User model with Admin/End User roles, JWT auth with RBAC foundation (`require_admin`), pytest suite (unit + integration), Docker Compose for infra, and full documentation discipline established.
 
 **Known debt (intentionally deferred, not forgotten):**
